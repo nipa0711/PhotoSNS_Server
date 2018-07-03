@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="E:/학습자료/모바일 프로그래밍/commons-logging-1.1.3.jar"/>
+	<classpathentry kind="lib" path="E:/학습자료/모바일 프로그래밍/httpclient-4.3.jar"/>
+	<classpathentry kind="lib" path="E:/학습자료/모바일 프로그래밍/httpclient-cache-4.3.jar"/>
+	<classpathentry kind="lib" path="E:/학습자료/모바일 프로그래밍/httpcore-4.3.jar"/>
+	<classpathentry kind="lib" path="E:/학습자료/모바일 프로그래밍/httpmime-4.3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="E:/Programming/Java/PhotoSNS_Server/sqlite-jdbc-3.8.10.1.jar"/>
+	<classpathentry kind="lib" path="E:/Programming/Java/PhotoSNS_Server/commons-codec-1.10.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

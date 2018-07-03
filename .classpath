@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="PhotoSNS_Server/src"/>
+	<classpathentry kind="lib" path="PhotoSNS_Server/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="PhotoSNS_Server/sqlite-jdbc-3.8.10.1.jar"/>
+	<classpathentry kind="output" path="PhotoSNS_Server/bin"/>
+</classpath>
