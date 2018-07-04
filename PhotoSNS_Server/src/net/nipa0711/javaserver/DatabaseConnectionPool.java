@@ -1,3 +1,4 @@
+package net.nipa0711.javaserver;
 
 import java.sql.Connection;
 import java.sql.Driver;
