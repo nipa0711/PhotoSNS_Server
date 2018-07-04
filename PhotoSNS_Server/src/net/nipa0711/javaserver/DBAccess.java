@@ -170,14 +170,14 @@ public class DBAccess {
 		dbConnectionPool.freeConnection(c);
 	}
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 
 		try {
 			// SQLite DB 사용
-			/*
+			
 			 * DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
 			 * "jdbc:sqlite:/d:\\PhotoSNS.db", "", "");
-			 */
+			 
 
 			// User 테이블에 새로운 레코드 추가
 			// db.insert(101, "101", "김상진", "컴퓨터공학과", "010-2935-2275");
@@ -194,5 +194,5 @@ public class DBAccess {
 		} catch (Exception e) {
 			System.out.println("데이터베이스 액세스를 실패하였습니다.");
 		}
-	}
+	}*/
 }

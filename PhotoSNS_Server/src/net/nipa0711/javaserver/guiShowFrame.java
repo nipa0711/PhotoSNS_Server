@@ -1,4 +1,5 @@
 package net.nipa0711.javaserver;
+
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -27,6 +28,7 @@ public class guiShowFrame extends JFrame {
 		btnServerExit.setSize(300, 75);
 		btnServerExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("Server end");
 				System.exit(0);
 			}
 		});
@@ -42,7 +44,6 @@ public class guiShowFrame extends JFrame {
 		guiShowFrame frame = new guiShowFrame();
 		frame.setVisible(true);
 		frame.setSize(300, 200);
-
 	}
 
 }
