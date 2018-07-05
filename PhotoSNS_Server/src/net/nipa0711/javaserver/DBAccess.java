@@ -170,29 +170,24 @@ public class DBAccess {
 		dbConnectionPool.freeConnection(c);
 	}
 
-	/*public static void main(String[] args) {
-
-		try {
-			// SQLite DB 사용
-			
-			 * DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-			 * "jdbc:sqlite:/d:\\PhotoSNS.db", "", "");
-			 
-
-			// User 테이블에 새로운 레코드 추가
-			// db.insert(101, "101", "김상진", "컴퓨터공학과", "010-2935-2275");
-
-			// User 테이블의 기존 레코드 갱신 (비밀번호 변경)
-			// db.update(101, "1245");
-
-			// User 테이블의 특정 레코드 삭제
-			// db.delete(102);
-
-			// User 테이블의 학생 레코드 검색
-			// String str = db.search(101);
-			// System.out.println(str);
-		} catch (Exception e) {
-			System.out.println("데이터베이스 액세스를 실패하였습니다.");
-		}
-	}*/
+	/*
+	 * public static void main(String[] args) {
+	 * 
+	 * try { // SQLite DB 사용
+	 * 
+	 * DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
+	 * "jdbc:sqlite:/d:\\PhotoSNS.db", "", "");
+	 * 
+	 * 
+	 * // User 테이블에 새로운 레코드 추가 // db.insert(101, "101", "김상진", "컴퓨터공학과",
+	 * "010-2935-2275");
+	 * 
+	 * // User 테이블의 기존 레코드 갱신 (비밀번호 변경) // db.update(101, "1245");
+	 * 
+	 * // User 테이블의 특정 레코드 삭제 // db.delete(102);
+	 * 
+	 * // User 테이블의 학생 레코드 검색 // String str = db.search(101); //
+	 * System.out.println(str); } catch (Exception e) {
+	 * System.out.println("데이터베이스 액세스를 실패하였습니다."); } }
+	 */
 }

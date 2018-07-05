@@ -26,10 +26,10 @@ public class HttpService implements HttpHandler {
 			System.out.println("params:" + params);
 			String results = "If you see this message, it means you are wrong!";
 
-			String raspiPath = "/home/pi/Desktop/PhotoSNS.db";
+			//String raspiPath = "/home/pi/Desktop/PhotoSNS.db";
 			String windowPath = "//d:\\PhotoSNS.db";
 			String dbPath;
-			dbPath = raspiPath;
+			dbPath = windowPath;
 
 			switch (command) {
 			case 0:
@@ -42,11 +42,9 @@ public class HttpService implements HttpHandler {
 					db.insert(androidMsg[0], androidMsg[1], androidMsg[2], androidMsg[3], androidMsg[4]);
 
 					System.out.println("add complete");
-					guiShowFrame a = new guiShowFrame();
-					a.textField.setText("add complete");
+					guiShowFrame.changeText("add complete");
 
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				break;
@@ -56,11 +54,9 @@ public class HttpService implements HttpHandler {
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC", "jdbc:sqlite:" + dbPath, "", "");
 					results = db.getAll();
 					System.out.println("release complete");
-					guiShowFrame a = new guiShowFrame();
-					a.textField.setText("release complete");
+					guiShowFrame.changeText("release complete");
 
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				break;
@@ -70,8 +66,7 @@ public class HttpService implements HttpHandler {
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC", "jdbc:sqlite:" + dbPath, "", "");
 					db.delete(params);
 					System.out.println("delete complete");
-					guiShowFrame a = new guiShowFrame();
-					a.textField.setText("delete complete");
+					guiShowFrame.changeText("delete complete");
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -84,9 +79,7 @@ public class HttpService implements HttpHandler {
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC", "jdbc:sqlite:" + dbPath, "", ""); // d:\\PhotoSNS.db
 					results = db.getBigPhoto(params);
 					System.out.println("release complete");
-					guiShowFrame a = new guiShowFrame();
-					a.repaint();
-					a.textField.setText("release complete");
+					guiShowFrame.changeText("release complete");
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -96,7 +89,7 @@ public class HttpService implements HttpHandler {
 
 			}
 
-			/* GET 또는 POST 요청 처리 부분 */
+			// GET 또는 POST 요청 처리 부분 
 
 			// 응답 메시지 작성 (예시)
 			// String results = "SERVER SEND TO YOU - HELLO";

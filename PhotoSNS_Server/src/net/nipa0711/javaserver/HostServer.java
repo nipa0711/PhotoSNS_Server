@@ -25,11 +25,12 @@ public class HostServer {
 
 		// HTTP 서버 구동
 		HostServer server = new HostServer();
-		server.httpservice(port);
+		server.HttpService(port);
 		System.out.println("현재 서버 접속 포트 번호 : " + port);
+		guiShowFrame.changeText("서버 접속 포트 번호 : " + port);
 	}
 
-	private void httpservice(int port) {
+	private void HttpService(int port) {
 		try {
 			// HttpServer 객체 생성
 			InetSocketAddress addr = new InetSocketAddress(port);
@@ -45,10 +46,6 @@ public class HostServer {
 			server.setExecutor(Executors.newCachedThreadPool());
 			server.start();
 			System.out.println("SERVER START!");
-
-			guiShowFrame a = new guiShowFrame();
-			a.textField.setText("SERVER START!");
-			a.revalidate();
 		} catch (Exception e) {
 			System.out.println("[HTTP 서비스 오류] " + e.getMessage());
 		}
