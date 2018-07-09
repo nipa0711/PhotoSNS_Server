@@ -23,6 +23,33 @@ public class DBAccess {
 		}
 	}
 
+	public void createTable() throws Exception {
+		String sql = "CREATE TABLE PhotoSNS (quote VARCHAR2(255), uploader VARCHAR2(255), thumbnail BLOB, uploadDate VARCHAR2(255),metadata string, photo BLOB);";
+
+		// 데이터베이스 커넥션 가져오기
+		Connection c = dbConnectionPool.getConnection();
+		if (c == null)
+			throw new Exception();
+
+		try {
+			// 삽입 SQL 문장 실행
+			PreparedStatement pstmt = c.prepareStatement(sql);
+
+			pstmt.executeUpdate();
+			pstmt.close();
+			c.setAutoCommit(true);
+		} catch (SQLException e) {
+			System.out.println("[추가 오류]" + e.getMessage());
+			throw e;
+		} catch (NullPointerException e) {
+			System.out.println("[추가 오류]" + e.getMessage());
+			throw e;
+		}
+
+		// 데이터베이스 커넥션 반납
+		dbConnectionPool.freeConnection(c);
+	}
+
 	/* 새로운 레코드를 PhotoSNS 테이블에 저장 */
 	public void insert(String uploader, String quote, String thumbnail, String metadata, String photo)
 			throws Exception {

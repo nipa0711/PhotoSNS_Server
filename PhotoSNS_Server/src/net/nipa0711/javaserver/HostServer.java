@@ -19,7 +19,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
 public class HostServer {
-	public void start() {
+	public void Start() {
 		// HTTP 서버 Port 지정
 		int port = 1234;
 

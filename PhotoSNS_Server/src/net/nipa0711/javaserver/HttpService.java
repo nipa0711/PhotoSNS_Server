@@ -27,7 +27,7 @@ public class HttpService implements HttpHandler {
 			String results = "If you see this message, it means you are wrong!";
 
 			//String raspiPath = "/home/pi/Desktop/PhotoSNS.db";
-			String windowPath = "//d:\\PhotoSNS.db";
+			String windowPath = "//e:\\sqlite\\db\\PhotoSNS.db";
 			String dbPath;
 			dbPath = windowPath;
 
