@@ -20,14 +20,13 @@ import com.sun.net.httpserver.HttpServer;
 
 public class HostServer {
 	public void Start() {
-		// HTTP 서버 Port 지정
-		int port = 1234;
+		Variable var = new Variable();
 
 		// HTTP 서버 구동
 		HostServer server = new HostServer();
-		server.HttpService(port);
-		System.out.println("현재 서버 접속 포트 번호 : " + port);
-		guiShowFrame.changeText("서버 접속 포트 번호 : " + port);
+		server.HttpService(var.port);
+		System.out.println("현재 서버 접속 포트 번호 : " + var.port);
+		guiShowFrame.changeText("서버 접속 포트 번호 : " + var.port);
 	}
 
 	private void HttpService(int port) {

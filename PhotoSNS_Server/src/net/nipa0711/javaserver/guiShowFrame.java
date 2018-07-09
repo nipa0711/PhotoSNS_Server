@@ -51,21 +51,21 @@ public class guiShowFrame extends JFrame {
 		getContentPane().add(textField, BorderLayout.SOUTH);
 	}
 
-	public static void createNewDatabase(String fileName) {
-		String directory = "e:/sqlite/db/";
-		boolean dirChk = new File(directory).exists();
-		
+	public static void createNewDatabase() {
+		Variable var = new Variable();
+
+		boolean dirChk = new File(var.db_directory + "/" + var.db_Name).exists();
 
 		if (dirChk == false) {
-			new File(directory).mkdirs();
-			String url = "jdbc:sqlite:" + directory + fileName;
-			
+			new File(var.db_directory).mkdirs();
+			String url = "jdbc:sqlite:" + var.db_directory + var.db_Name;
+
 			try (Connection conn = DriverManager.getConnection(url)) {
 				if (conn != null) {
 					DatabaseMetaData meta = conn.getMetaData();
 					System.out.println("The driver name is " + meta.getDriverName());
 					System.out.println("A new database has been created.");
-					makeTable(directory, fileName);
+					makeTable();
 				}
 
 			} catch (SQLException e) {
@@ -74,10 +74,11 @@ public class guiShowFrame extends JFrame {
 		}
 	}
 
-	public static void makeTable(String directory, String fileName) {
+	public static void makeTable() {
 		try {
-			DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC", "jdbc:sqlite:" + directory + "\\" + fileName, "",
-					"");
+			Variable var = new Variable();
+			DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
+					"jdbc:sqlite:" + var.db_directory + "\\" + var.db_Name, "", "");
 			db.createTable();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -89,7 +90,7 @@ public class guiShowFrame extends JFrame {
 		guiShowFrame frame = new guiShowFrame();
 		frame.setVisible(true);
 		frame.setSize(300, 200);
-		createNewDatabase("photoSNS.db");
+		createNewDatabase();
 		changeText("initializing...");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}

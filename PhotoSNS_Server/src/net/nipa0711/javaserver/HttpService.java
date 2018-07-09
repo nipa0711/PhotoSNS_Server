@@ -26,16 +26,14 @@ public class HttpService implements HttpHandler {
 			System.out.println("params:" + params);
 			String results = "If you see this message, it means you are wrong!";
 
-			//String raspiPath = "/home/pi/Desktop/PhotoSNS.db";
-			String windowPath = "//e:\\sqlite\\db\\PhotoSNS.db";
-			String dbPath;
-			dbPath = windowPath;
+			Variable var = new Variable();
 
 			switch (command) {
 			case 0:
 				try {
 					// SQLite DB 사용
-					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC", "jdbc:sqlite:" + dbPath, "", "");
+					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
+							"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
 
 					String androidMsg[] = params.split("[%]");
 
@@ -51,7 +49,8 @@ public class HttpService implements HttpHandler {
 			case 2:
 				try {
 					// SQLite DB 사용
-					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC", "jdbc:sqlite:" + dbPath, "", "");
+					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
+							"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
 					results = db.getAll();
 					System.out.println("release complete");
 					guiShowFrame.changeText("release complete");
@@ -63,7 +62,8 @@ public class HttpService implements HttpHandler {
 			case 4:
 				try {
 					// SQLite DB 사용
-					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC", "jdbc:sqlite:" + dbPath, "", "");
+					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
+							"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
 					db.delete(params);
 					System.out.println("delete complete");
 					guiShowFrame.changeText("delete complete");
@@ -76,7 +76,8 @@ public class HttpService implements HttpHandler {
 			case 6:
 				try {
 					// SQLite DB 사용
-					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC", "jdbc:sqlite:" + dbPath, "", ""); // d:\\PhotoSNS.db
+					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
+							"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
 					results = db.getBigPhoto(params);
 					System.out.println("release complete");
 					guiShowFrame.changeText("release complete");
@@ -89,7 +90,7 @@ public class HttpService implements HttpHandler {
 
 			}
 
-			// GET 또는 POST 요청 처리 부분 
+			// GET 또는 POST 요청 처리 부분
 
 			// 응답 메시지 작성 (예시)
 			// String results = "SERVER SEND TO YOU - HELLO";

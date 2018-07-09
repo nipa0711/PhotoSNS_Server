@@ -24,7 +24,7 @@ public class DBAccess {
 	}
 
 	public void createTable() throws Exception {
-		String sql = "CREATE TABLE PhotoSNS (quote VARCHAR2(255), uploader VARCHAR2(255), thumbnail BLOB, uploadDate VARCHAR2(255),metadata string, photo BLOB);";
+		String sql = "CREATE TABLE PhotoSNS (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, quote VARCHAR2(255), uploader VARCHAR2(255), thumbnail BLOB, uploadDate VARCHAR2(255),metadata string, photo BLOB);";
 
 		// 데이터베이스 커넥션 가져오기
 		Connection c = dbConnectionPool.getConnection();
