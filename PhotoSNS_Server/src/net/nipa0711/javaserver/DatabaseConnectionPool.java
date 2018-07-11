@@ -18,13 +18,13 @@ public class DatabaseConnectionPool {
 	private String url;
 	private String user;
 	private Driver driver;
-	private Vector freeConnections;
+	private Vector<Connection> freeConnections;
 	private int maxConn;
 	private int count;
 
 	public DatabaseConnectionPool(String dbName, String drivername, String conUrl, String conUser, String conPassword)
 			throws SQLException {
-		freeConnections = new Vector();
+		freeConnections = new Vector<Connection>();
 		this.dbName = dbName;
 		this.driverName = drivername;
 		this.url = conUrl;
@@ -90,7 +90,7 @@ public class DatabaseConnectionPool {
 	}
 
 	private synchronized void closeAll() {
-		for (Enumeration enumeration = freeConnections.elements(); enumeration.hasMoreElements();) {
+		for (Enumeration<Connection> enumeration = freeConnections.elements(); enumeration.hasMoreElements();) {
 			Connection connection = (Connection) enumeration.nextElement();
 			try {
 				connection.close();

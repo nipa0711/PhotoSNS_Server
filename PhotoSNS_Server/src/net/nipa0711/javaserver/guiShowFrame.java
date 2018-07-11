@@ -1,11 +1,9 @@
 package net.nipa0711.javaserver;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -18,6 +16,7 @@ import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
 public class guiShowFrame extends JFrame {
+	private static final long serialVersionUID = -1407364621488475621L;
 	static JTextField textField;
 
 	public static void changeText(String text) {
@@ -81,7 +80,6 @@ public class guiShowFrame extends JFrame {
 					"jdbc:sqlite:" + var.db_directory + "\\" + var.db_Name, "", "");
 			db.createTable();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

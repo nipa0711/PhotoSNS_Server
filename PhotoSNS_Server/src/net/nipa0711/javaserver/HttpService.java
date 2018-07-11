@@ -12,7 +12,7 @@ public class HttpService implements HttpHandler {
 
 	public void handle(HttpExchange exchange) throws IOException {
 		// parameters 파라메터를 Map 자료구조에 저장
-		Map<String, Object> parameters = (Map<String, Object>) exchange.getAttribute("parameters");
+		Map<?, ?> parameters = (Map<?, ?>) exchange.getAttribute("parameters");
 
 		// HTTP 요청방식에 따른 처리절차 수행
 		String request = exchange.getRequestMethod();
@@ -69,7 +69,6 @@ public class HttpService implements HttpHandler {
 					guiShowFrame.changeText("delete complete");
 
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				break;
@@ -83,7 +82,6 @@ public class HttpService implements HttpHandler {
 					guiShowFrame.changeText("release complete");
 
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				break;
