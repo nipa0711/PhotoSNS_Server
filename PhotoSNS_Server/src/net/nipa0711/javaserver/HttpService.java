@@ -23,24 +23,24 @@ public class HttpService implements HttpHandler {
 			String params = (String) parameters.get("params");
 			System.out.println("command:" + command);
 			System.out.println("id:" + id);
-			System.out.println("params:" + params);
+			// System.out.println("params:" + params);
 			String results = "If you see this message, it means you are wrong!";
-
-			Variable var = new Variable();
 
 			switch (command) {
 			case 0:
 				try {
 					// SQLite DB 사용
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-							"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
+							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
 
 					String androidMsg[] = params.split("[%]");
+					String uploader = androidMsg[0];
+					String quote = androidMsg[1];
+					String metadata = androidMsg[2];
+					String photoHex = androidMsg[3];
 
-					db.insert(androidMsg[0], androidMsg[1], androidMsg[2], androidMsg[3], androidMsg[4]);
-
+					db.insert(uploader, quote, metadata, photoHex);
 					System.out.println("add complete");
-
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -49,7 +49,7 @@ public class HttpService implements HttpHandler {
 				try {
 					// SQLite DB 사용
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-							"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
+							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
 					results = db.getAll();
 					System.out.println("release complete");
 
@@ -61,7 +61,7 @@ public class HttpService implements HttpHandler {
 				try {
 					// SQLite DB 사용
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-							"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
+							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
 					db.delete(params);
 					System.out.println("delete complete");
 
@@ -73,7 +73,7 @@ public class HttpService implements HttpHandler {
 				try {
 					// SQLite DB 사용
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-							"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
+							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
 					results = db.getBigPhoto(params);
 					System.out.println("release complete");
 

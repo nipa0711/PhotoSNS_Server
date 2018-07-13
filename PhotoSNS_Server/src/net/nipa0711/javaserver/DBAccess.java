@@ -27,20 +27,23 @@ public class DBAccess {
 	}
 
 	public boolean checkDatabase() {
-		Variable var = new Variable();
-
-		boolean dirChk = new File(var.db_directory + "/" + var.db_Name).exists();
+		boolean dirChk = new File((Variable.db_directory + "/" + Variable.db_Name)).exists();
 		if (dirChk == true) {
+			System.out.println("database is already exist");
 			return true;
 		}
 		return false;
 	}
 
 	public void createNewDatabase() {
-		Variable var = new Variable();
 		if (checkDatabase() == false) {
-			new File(var.db_directory).mkdirs();
-			String url = "jdbc:sqlite:" + var.db_directory + var.db_Name;
+			new File(Variable.db_directory).mkdirs();
+			System.out.println("created database here : " + Variable.db_directory);
+			new File(Variable.photo_directory).mkdirs();
+			System.out.println("created photo directory here : " + Variable.photo_directory);
+			new File(Variable.thumbnail_directory).mkdirs();
+			System.out.println("created thumbnail directory here : " + Variable.thumbnail_directory);
+			String url = "jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name;
 
 			try (Connection conn = DriverManager.getConnection(url)) {
 				if (conn != null) {
@@ -58,9 +61,8 @@ public class DBAccess {
 
 	public void makeTable() {
 		try {
-			Variable var = new Variable();
 			DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-					"jdbc:sqlite:" + var.db_directory + "\\" + var.db_Name, "", "");
+					"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
 			db.createTable();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -95,7 +97,7 @@ public class DBAccess {
 	}
 
 	/* 새로운 레코드를 PhotoSNS 테이블에 저장 */
-	public void insert(String userid, String quote, String thumbnail, String metadata, String photo) throws Exception {
+	public void insert(String userid, String quote, String metadata, String photoHex) throws Exception {
 		// 데이터베이스 커넥션 가져오기
 		Connection c = dbConnectionPool.getConnection();
 		if (c == null)
@@ -104,11 +106,17 @@ public class DBAccess {
 		long time = System.currentTimeMillis();
 		SimpleDateFormat takenTime = new SimpleDateFormat("yyyy년MM월dd일 HH시mm분ss초");
 		String photoUploadTime = takenTime.format(new Date(time));
+		String photoName = userid + "_" + photoUploadTime + ".jpg";
+
+		String photoPath = Variable.photo_directory + "/" + photoName;
+		ImageService.saveToFile(photoHex, photoPath);
+		String thumbnail = Variable.thumbnail_directory + "/" + "thumb_" + photoName;
+		ImageService.makeThumbnail(photoPath, thumbnail);
 
 		// 삽입 SQL 문장 작성
 		String sql = "INSERT INTO PhotoSNS (userid,quote,  thumbnail,uploadDate,metadata, photo)" + " VALUES ( '"
 				+ userid + "', '" + quote + "', '" + thumbnail + "','" + photoUploadTime + "','" + metadata + "','"
-				+ photo + "');";
+				+ photoName + "');";
 		try {
 			// 삽입 SQL 문장 실행
 			PreparedStatement pstmt = c.prepareStatement(sql);
@@ -144,8 +152,9 @@ public class DBAccess {
 			ResultSet rs = pstmt.executeQuery();
 
 			while (rs.next()) {
-
-				sb.append(rs.getString(1) + "%" + rs.getString(2) + "%" + rs.getString(3) + "%" + rs.getString(4) + "%"
+				String thumbnailPath = rs.getString(4);
+				String Base64Thumbnail = ImageService.imageToBase64(thumbnailPath);
+				sb.append(rs.getString(1) + "%" + rs.getString(2) + "%" + rs.getString(3) + "%" + Base64Thumbnail + "%"
 						+ rs.getString(5) + "%" + rs.getString(6) + "#");
 			}
 

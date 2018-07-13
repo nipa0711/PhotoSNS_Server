@@ -23,6 +23,7 @@ public class PhotoSNS_Main {
 	public static void main(String[] args) {
 		File home = FileSystemView.getFileSystemView().getHomeDirectory();
 		String db_path = home.getAbsolutePath();
+		db_path = db_path + "/PhotoSNS";
 		if (args.length < 1) {
 			how_to_use(db_path);
 		} else if (args.length > 5) {
@@ -65,25 +66,30 @@ public class PhotoSNS_Main {
 				return;
 			}
 
+			String photoDir = "/photo";
+			String thumbDir = "/thumbnail";
 			Variable var = new Variable();
 			if (isDefaultExist == true) {
-				var.db_directory = db_path;
+				Variable.db_directory = db_path;
 				var.port = 1234;
 			} else {
 				if (argsMap.containsKey("-path")) {
-					var.db_directory = argsMap.get("-path");
+					Variable.db_directory = argsMap.get("-path") + "/PhotoSNS";
 				}
 				if (argsMap.containsKey("-port")) {
 					var.port = Integer.parseInt(argsMap.get("-port"));
 				}
 			}
 
-			System.out.println("database directory : " + var.db_directory);
+			Variable.photo_directory = Variable.db_directory + photoDir;
+			Variable.thumbnail_directory = Variable.db_directory + thumbDir;
+
+			System.out.println("database directory : " + Variable.db_directory);
 			System.out.println("port : " + var.port);
 
 			try {
 				DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-						"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
+						"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
 				db.createNewDatabase();
 			} catch (Exception e) {
 				e.printStackTrace();
