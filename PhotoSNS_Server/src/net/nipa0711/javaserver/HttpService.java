@@ -40,7 +40,6 @@ public class HttpService implements HttpHandler {
 					db.insert(androidMsg[0], androidMsg[1], androidMsg[2], androidMsg[3], androidMsg[4]);
 
 					System.out.println("add complete");
-					guiShowFrame.changeText("add complete");
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -53,7 +52,6 @@ public class HttpService implements HttpHandler {
 							"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
 					results = db.getAll();
 					System.out.println("release complete");
-					guiShowFrame.changeText("release complete");
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -66,7 +64,6 @@ public class HttpService implements HttpHandler {
 							"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
 					db.delete(params);
 					System.out.println("delete complete");
-					guiShowFrame.changeText("delete complete");
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -79,7 +76,6 @@ public class HttpService implements HttpHandler {
 							"jdbc:sqlite:" + var.db_directory + "/" + var.db_Name, "", "");
 					results = db.getBigPhoto(params);
 					System.out.println("release complete");
-					guiShowFrame.changeText("release complete");
 
 				} catch (Exception e) {
 					e.printStackTrace();

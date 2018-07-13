@@ -1,8 +1,8 @@
 package net.nipa0711.javaserver;
 
 public class Variable {
-	final String db_directory = "e:/sqlite/db/";
+	String db_directory = "";
 	final String db_Name = "photoSNS.db";
-	// HTTP 서버 Port 지정
-	final int port = 1234;
+	// HTTP server port
+	int port = 1234;
 }

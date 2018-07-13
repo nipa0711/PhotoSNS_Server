@@ -25,8 +25,6 @@ public class HostServer {
 		// HTTP 서버 구동
 		HostServer server = new HostServer();
 		server.HttpService(var.port);
-		System.out.println("현재 서버 접속 포트 번호 : " + var.port);
-		guiShowFrame.changeText("서버 접속 포트 번호 : " + var.port);
 	}
 
 	private void HttpService(int port) {

@@ -1,6 +1,9 @@
 package net.nipa0711.javaserver;
 
+import java.io.File;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,8 +26,49 @@ public class DBAccess {
 		}
 	}
 
+	public boolean checkDatabase() {
+		Variable var = new Variable();
+
+		boolean dirChk = new File(var.db_directory + "/" + var.db_Name).exists();
+		if (dirChk == true) {
+			return true;
+		}
+		return false;
+	}
+
+	public void createNewDatabase() {
+		Variable var = new Variable();
+		if (checkDatabase() == false) {
+			new File(var.db_directory).mkdirs();
+			String url = "jdbc:sqlite:" + var.db_directory + var.db_Name;
+
+			try (Connection conn = DriverManager.getConnection(url)) {
+				if (conn != null) {
+					DatabaseMetaData meta = conn.getMetaData();
+					System.out.println("The driver name is " + meta.getDriverName());
+					System.out.println("A new database has been created.");
+					makeTable();
+				}
+
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+	}
+
+	public void makeTable() {
+		try {
+			Variable var = new Variable();
+			DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
+					"jdbc:sqlite:" + var.db_directory + "\\" + var.db_Name, "", "");
+			db.createTable();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void createTable() throws Exception {
-		String sql = "CREATE TABLE PhotoSNS (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, quote VARCHAR2(255), uploader VARCHAR2(255), thumbnail BLOB, uploadDate VARCHAR2(255),metadata string, photo BLOB);";
+		String sql = "CREATE TABLE PhotoSNS (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, userid VARCHAR2(255), quote VARCHAR2(255), thumbnail BLOB, uploadDate VARCHAR2(255),metadata string, photo BLOB);";
 
 		// 데이터베이스 커넥션 가져오기
 		Connection c = dbConnectionPool.getConnection();
@@ -51,8 +95,7 @@ public class DBAccess {
 	}
 
 	/* 새로운 레코드를 PhotoSNS 테이블에 저장 */
-	public void insert(String uploader, String quote, String thumbnail, String metadata, String photo)
-			throws Exception {
+	public void insert(String userid, String quote, String thumbnail, String metadata, String photo) throws Exception {
 		// 데이터베이스 커넥션 가져오기
 		Connection c = dbConnectionPool.getConnection();
 		if (c == null)
@@ -63,8 +106,8 @@ public class DBAccess {
 		String photoUploadTime = takenTime.format(new Date(time));
 
 		// 삽입 SQL 문장 작성
-		String sql = "INSERT INTO PhotoSNS (quote, uploader, thumbnail,uploadDate,metadata, photo)" + " VALUES ( '"
-				+ quote + "', '" + uploader + "', '" + thumbnail + "','" + photoUploadTime + "','" + metadata + "','"
+		String sql = "INSERT INTO PhotoSNS (userid,quote,  thumbnail,uploadDate,metadata, photo)" + " VALUES ( '"
+				+ userid + "', '" + quote + "', '" + thumbnail + "','" + photoUploadTime + "','" + metadata + "','"
 				+ photo + "');";
 		try {
 			// 삽입 SQL 문장 실행
@@ -92,7 +135,7 @@ public class DBAccess {
 			throw new Exception();
 
 		// 반환 SQL 문장 작성
-		String sql = "SELECT id,quote,uploader,thumbnail,uploadDate,metadata FROM PhotoSNS ORDER BY id DESC";
+		String sql = "SELECT id, userid,quote,thumbnail,uploadDate,metadata FROM PhotoSNS ORDER BY id DESC";
 		StringBuffer sb = new StringBuffer();
 		try {
 
