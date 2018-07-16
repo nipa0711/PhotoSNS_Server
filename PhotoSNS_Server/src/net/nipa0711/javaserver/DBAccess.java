@@ -107,7 +107,6 @@ public class DBAccess {
 		SimpleDateFormat takenTime = new SimpleDateFormat("yyyy년MM월dd일 HH시mm분ss초");
 		String photoUploadTime = takenTime.format(new Date(time));
 		String photoName = userid + "_" + photoUploadTime + ".jpg";
-
 		String photoPath = Variable.photo_directory + "/" + photoName;
 		ImageService.saveToFile(photoHex, photoPath);
 		String thumbnail = Variable.thumbnail_directory + "/" + "thumb_" + photoName;
@@ -116,7 +115,7 @@ public class DBAccess {
 		// 삽입 SQL 문장 작성
 		String sql = "INSERT INTO PhotoSNS (userid,quote,  thumbnail,uploadDate,metadata, photo)" + " VALUES ( '"
 				+ userid + "', '" + quote + "', '" + thumbnail + "','" + photoUploadTime + "','" + metadata + "','"
-				+ photoName + "');";
+				+ photoPath + "');";
 		try {
 			// 삽입 SQL 문장 실행
 			PreparedStatement pstmt = c.prepareStatement(sql);
@@ -195,7 +194,9 @@ public class DBAccess {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			rs.next();
-			sb.append(rs.getString(1));
+			String bigPhoto = rs.getString(1);
+			String Base64BigPhoto = ImageService.imageToBase64(bigPhoto);
+			sb.append(Base64BigPhoto);
 
 			if (rs != null) {
 				try {
@@ -248,25 +249,4 @@ public class DBAccess {
 		// 데이터베이스 커넥션 반납
 		dbConnectionPool.freeConnection(c);
 	}
-
-	/*
-	 * public static void main(String[] args) {
-	 * 
-	 * try { // SQLite DB 사용
-	 * 
-	 * DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-	 * "jdbc:sqlite:/d:\\PhotoSNS.db", "", "");
-	 * 
-	 * 
-	 * // User 테이블에 새로운 레코드 추가 // db.insert(101, "101", "김상진", "컴퓨터공학과",
-	 * "010-2935-2275");
-	 * 
-	 * // User 테이블의 기존 레코드 갱신 (비밀번호 변경) // db.update(101, "1245");
-	 * 
-	 * // User 테이블의 특정 레코드 삭제 // db.delete(102);
-	 * 
-	 * // User 테이블의 학생 레코드 검색 // String str = db.search(101); //
-	 * System.out.println(str); } catch (Exception e) {
-	 * System.out.println("데이터베이스 액세스를 실패하였습니다."); } }
-	 */
 }

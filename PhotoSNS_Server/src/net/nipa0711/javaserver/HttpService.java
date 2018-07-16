@@ -19,10 +19,10 @@ public class HttpService implements HttpHandler {
 		if (request.equalsIgnoreCase("GET") || request.equalsIgnoreCase("POST")) {
 			// 요청 파라메터 가져오기
 			int command = Integer.parseInt((String) parameters.get("command"));
-			String id = (String) parameters.get("id");
+			//String id = (String) parameters.get("id");
 			String params = (String) parameters.get("params");
 			System.out.println("command:" + command);
-			System.out.println("id:" + id);
+			//System.out.println("id:" + id);
 			// System.out.println("params:" + params);
 			String results = "If you see this message, it means you are wrong!";
 
@@ -63,6 +63,7 @@ public class HttpService implements HttpHandler {
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
 							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
 					db.delete(params);
+					db.notifyAll();
 					System.out.println("delete complete");
 
 				} catch (Exception e) {
