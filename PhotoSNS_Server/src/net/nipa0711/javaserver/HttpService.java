@@ -31,7 +31,7 @@ public class HttpService implements HttpHandler {
 				try {
 					// SQLite DB 사용
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
+							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_SNS, "", "");
 
 					String androidMsg[] = params.split("[%]");
 					String uploader = androidMsg[0];
@@ -39,7 +39,7 @@ public class HttpService implements HttpHandler {
 					String metadata = androidMsg[2];
 					String photoHex = androidMsg[3];
 
-					db.insert(uploader, quote, metadata, photoHex);
+					db.insertToPhotoSNS(uploader, quote, metadata, photoHex);
 					System.out.println("add complete");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -49,10 +49,9 @@ public class HttpService implements HttpHandler {
 				try {
 					// SQLite DB 사용
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
+							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_SNS, "", "");
 					results = db.getAll();
 					System.out.println("release complete");
-
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -61,9 +60,9 @@ public class HttpService implements HttpHandler {
 				try {
 					// SQLite DB 사용
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
+							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_SNS, "", "");
 					db.delete(params);
-					db.notifyAll();
+					//db.notifyAll();
 					System.out.println("delete complete");
 
 				} catch (Exception e) {
@@ -74,7 +73,7 @@ public class HttpService implements HttpHandler {
 				try {
 					// SQLite DB 사용
 					DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
+							"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_SNS, "", "");
 					results = db.getBigPhoto(params);
 					System.out.println("release complete");
 

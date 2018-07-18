@@ -68,16 +68,15 @@ public class PhotoSNS_Main {
 
 			String photoDir = "/photo";
 			String thumbDir = "/thumbnail";
-			Variable var = new Variable();
 			if (isDefaultExist == true) {
 				Variable.db_directory = db_path;
-				var.port = 1234;
+				Variable.port = 1234;
 			} else {
 				if (argsMap.containsKey("-path")) {
 					Variable.db_directory = argsMap.get("-path") + "/PhotoSNS";
 				}
 				if (argsMap.containsKey("-port")) {
-					var.port = Integer.parseInt(argsMap.get("-port"));
+					Variable.port = Integer.parseInt(argsMap.get("-port"));
 				}
 			}
 
@@ -85,11 +84,11 @@ public class PhotoSNS_Main {
 			Variable.thumbnail_directory = Variable.db_directory + thumbDir;
 
 			System.out.println("database directory : " + Variable.db_directory);
-			System.out.println("port : " + var.port);
+			System.out.println("port : " + Variable.port);
 
 			try {
 				DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-						"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
+						"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_SNS, "", "");
 				db.createNewDatabase();
 			} catch (Exception e) {
 				e.printStackTrace();

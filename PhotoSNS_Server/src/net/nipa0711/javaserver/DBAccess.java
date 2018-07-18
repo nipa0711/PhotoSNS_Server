@@ -6,6 +6,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,6 +14,9 @@ import java.util.Date;
 /* UserDB 데이터베이스에 있는 User 테이블 액세스 클래스 */
 public class DBAccess {
 	private DatabaseConnectionPool dbConnectionPool;
+	Connection c = null;
+	PreparedStatement pstmt = null;
+	ResultSet rs = null;
 
 	public DBAccess(String dbName, String driverName, String dbUrl, String dbUser, String dbPwd) throws Exception {
 
@@ -26,8 +30,41 @@ public class DBAccess {
 		}
 	}
 
+	public void db_connect() {
+		try {
+			// 데이터베이스 커넥션 가져오기
+			c = dbConnectionPool.getConnection();
+			if (c == null)
+				throw new Exception();
+			c.setAutoCommit(true);
+		} catch (Exception e) {
+			System.out.println("db_connect problem");
+			e.printStackTrace();
+		}
+	}
+
+	public void db_disconnect() {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (pstmt != null) {
+			try {
+				pstmt.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		// 데이터베이스 커넥션 반납
+		dbConnectionPool.freeConnection(c);
+	}
+
 	public boolean checkDatabase() {
-		boolean dirChk = new File((Variable.db_directory + "/" + Variable.db_Name)).exists();
+		boolean dirChk = new File((Variable.db_directory + "/" + Variable.db_SNS)).exists();
 		if (dirChk == true) {
 			System.out.println("database is already exist");
 			return true;
@@ -43,7 +80,7 @@ public class DBAccess {
 			System.out.println("created photo directory here : " + Variable.photo_directory);
 			new File(Variable.thumbnail_directory).mkdirs();
 			System.out.println("created thumbnail directory here : " + Variable.thumbnail_directory);
-			String url = "jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name;
+			String url = "jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_SNS;
 
 			try (Connection conn = DriverManager.getConnection(url)) {
 				if (conn != null) {
@@ -52,7 +89,6 @@ public class DBAccess {
 					System.out.println("A new database has been created.");
 					makeTable();
 				}
-
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
 			}
@@ -62,46 +98,55 @@ public class DBAccess {
 	public void makeTable() {
 		try {
 			DBAccess db = new DBAccess("SQLite", "org.sqlite.JDBC",
-					"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_Name, "", "");
-			db.createTable();
+					"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_SNS, "", "");
+			String sql = "CREATE TABLE PhotoSNS (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, userid TEXT NOT NULL, quote TEXT, thumbnail TEXT, uploadDate TEXT, metadata TEXT, photo TEXT);";
+			db.createTable(sql);
+
+			db = new DBAccess("SQLite", "org.sqlite.JDBC",
+					"jdbc:sqlite:" + Variable.db_directory + "/" + Variable.db_User, "", "");
+			sql = "CREATE TABLE UserInfo (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, userid TEXT NOT NULL, password TEXT NOT NULL, salt TEXT NOT NULL);";
+			db.createTable(sql);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void createTable() throws Exception {
-		String sql = "CREATE TABLE PhotoSNS (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, userid VARCHAR2(255), quote VARCHAR2(255), thumbnail BLOB, uploadDate VARCHAR2(255),metadata string, photo BLOB);";
-
-		// 데이터베이스 커넥션 가져오기
-		Connection c = dbConnectionPool.getConnection();
-		if (c == null)
-			throw new Exception();
+	public void insert(String sql) {
+		db_connect();
 
 		try {
 			// 삽입 SQL 문장 실행
-			PreparedStatement pstmt = c.prepareStatement(sql);
-
+			pstmt = c.prepareStatement(sql);
 			pstmt.executeUpdate();
 			pstmt.close();
 			c.setAutoCommit(true);
 		} catch (SQLException e) {
 			System.out.println("[추가 오류]" + e.getMessage());
-			throw e;
 		} catch (NullPointerException e) {
 			System.out.println("[추가 오류]" + e.getMessage());
-			throw e;
 		}
+		db_disconnect();
+	}
 
-		// 데이터베이스 커넥션 반납
-		dbConnectionPool.freeConnection(c);
+	public void createTable(String sql) {
+		try {
+			insert(sql);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void add_newbie(String userid, String password) throws Exception {
+		Security sec = new Security();
+		String salt = sec.generateSalt();
+		String hash = sec.getHash(password, salt);
+		String sql = "INSERT INTO UserInfo (userid, password, salt) VALUES ('" + userid + "','" + hash + "','" + salt
+				+ "');";
+		insert(sql);
 	}
 
 	/* 새로운 레코드를 PhotoSNS 테이블에 저장 */
-	public void insert(String userid, String quote, String metadata, String photoHex) throws Exception {
-		// 데이터베이스 커넥션 가져오기
-		Connection c = dbConnectionPool.getConnection();
-		if (c == null)
-			throw new Exception();
+	public void insertToPhotoSNS(String userid, String quote, String metadata, String photoHex) throws Exception {
 
 		long time = System.currentTimeMillis();
 		SimpleDateFormat takenTime = new SimpleDateFormat("yyyy년MM월dd일 HH시mm분ss초");
@@ -116,39 +161,67 @@ public class DBAccess {
 		String sql = "INSERT INTO PhotoSNS (userid,quote,  thumbnail,uploadDate,metadata, photo)" + " VALUES ( '"
 				+ userid + "', '" + quote + "', '" + thumbnail + "','" + photoUploadTime + "','" + metadata + "','"
 				+ photoPath + "');";
-		try {
-			// 삽입 SQL 문장 실행
-			PreparedStatement pstmt = c.prepareStatement(sql);
 
-			pstmt.executeUpdate();
-			pstmt.close();
-			c.setAutoCommit(true);
-		} catch (SQLException e) {
-			System.out.println("[추가 오류]" + e.getMessage());
-			throw e;
-		} catch (NullPointerException e) {
-			System.out.println("[추가 오류]" + e.getMessage());
+		insert(sql);
+	}
+
+	public String searchByUserID(String userid) throws Exception {
+		db_connect();
+		String sql = "SELECT * FROM UserInfo WHERE ( userid = '" + userid + "','" + "');";
+		String result = "";
+		StringBuffer sb = new StringBuffer();
+		try {
+			// 질의 SQL 문장 실행
+			pstmt = c.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				sb.append(rs.getString(2) + "%" + rs.getString(3) + "%" + rs.getString(4) + "#");
+			}
+		} catch (Exception e) {
+			System.out.println("[반환 오류]" + e.getMessage());
 			throw e;
 		}
 
-		// 데이터베이스 커넥션 반납
-		dbConnectionPool.freeConnection(c);
+		db_disconnect();
+		return result;
+	}
+
+	public String getData(String sql) throws Exception {
+		db_connect();
+		StringBuffer sb = new StringBuffer();
+		try {
+			// 질의 SQL 문장 실행
+			pstmt = c.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			ResultSetMetaData rsmd = rs.getMetaData();
+			while (rs.next()) {
+				for (int i = 1; i < rsmd.getColumnCount(); i++) {
+					sb.append(rs.getString(i) + "%");
+				}
+				sb.append(rs.getString(rsmd.getColumnCount()) + "#");
+			}
+
+		} catch (Exception e) {
+			System.out.println("[반환 오류]" + e.getMessage());
+			throw e;
+		}
+		db_disconnect();
+		// 결과 반환
+		return sb.toString();
 	}
 
 	public String getAll() throws Exception {
-		// 데이터베이스 커넥션 가져오기
-		Connection c = dbConnectionPool.getConnection();
-		if (c == null)
-			throw new Exception();
+		db_connect();
 
 		// 반환 SQL 문장 작성
 		String sql = "SELECT id, userid,quote,thumbnail,uploadDate,metadata FROM PhotoSNS ORDER BY id DESC";
 		StringBuffer sb = new StringBuffer();
-		try {
 
+		try {
 			// 질의 SQL 문장 실행
-			PreparedStatement pstmt = c.prepareStatement(sql);
-			ResultSet rs = pstmt.executeQuery();
+			pstmt = c.prepareStatement(sql);
+			rs = pstmt.executeQuery();
 
 			while (rs.next()) {
 				String thumbnailPath = rs.getString(4);
@@ -157,59 +230,31 @@ public class DBAccess {
 						+ rs.getString(5) + "%" + rs.getString(6) + "#");
 			}
 
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-				}
-			}
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException e) {
-				}
-			}
-
 		} catch (Exception e) {
 			System.out.println("[반환 오류]" + e.getMessage());
 			throw e;
 		}
 
-		// 데이터베이스 커넥션 반납
-		dbConnectionPool.freeConnection(c);
+		db_disconnect();
+
 		// 결과 반환
 		return sb.toString();
 	}
 
 	public String getBigPhoto(String id) throws Exception {
-		// 데이터베이스 커넥션 가져오기
-		Connection c = dbConnectionPool.getConnection();
-		if (c == null)
-			throw new Exception();
+		db_connect();
 		String sql = "SELECT photo FROM PhotoSNS WHERE id ='" + id + "';";
 		StringBuffer sb = new StringBuffer();
 
 		try {
 			// 삽입 SQL 문장 실행
-			PreparedStatement pstmt = c.prepareStatement(sql);
-			ResultSet rs = pstmt.executeQuery();
+			pstmt = c.prepareStatement(sql);
+			rs = pstmt.executeQuery();
 			rs.next();
 			String bigPhoto = rs.getString(1);
 			String Base64BigPhoto = ImageService.imageToBase64(bigPhoto);
 			sb.append(Base64BigPhoto);
 
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-				}
-			}
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException e) {
-				}
-			}
 		} catch (SQLException e) {
 			System.out.println("[추가 오류]" + e.getMessage());
 			throw e;
@@ -218,35 +263,13 @@ public class DBAccess {
 			throw e;
 		}
 
-		// 데이터베이스 커넥션 반납
-		dbConnectionPool.freeConnection(c);
+		db_disconnect();
 		return sb.toString();
 	}
 
-	public void delete(String id) throws Exception {
-		// 데이터베이스 커넥션 가져오기
-		Connection c = dbConnectionPool.getConnection();
-		if (c == null)
-			throw new Exception();
-
+	public void delete(String id) {
 		// 삽입 SQL 문장 작성
 		String sql = "DELETE FROM PhotoSNS WHERE id ='" + id + "';";
-		try {
-			// 삽입 SQL 문장 실행
-			PreparedStatement pstmt = c.prepareStatement(sql);
-
-			pstmt.executeUpdate();
-			pstmt.close();
-			c.setAutoCommit(true);
-		} catch (SQLException e) {
-			System.out.println("[추가 오류]" + e.getMessage());
-			throw e;
-		} catch (NullPointerException e) {
-			System.out.println("[추가 오류]" + e.getMessage());
-			throw e;
-		}
-
-		// 데이터베이스 커넥션 반납
-		dbConnectionPool.freeConnection(c);
+		insert(sql);
 	}
 }
