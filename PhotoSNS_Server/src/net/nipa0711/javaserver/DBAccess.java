@@ -19,14 +19,11 @@ public class DBAccess {
 	ResultSet rs = null;
 
 	public DBAccess(String dbName, String driverName, String dbUrl, String dbUser, String dbPwd) throws Exception {
-
 		// 데이터베이스 커넥션 풀 구성
 		try {
 			dbConnectionPool = new DatabaseConnectionPool(dbName, driverName, dbUrl, dbUser, dbPwd);
 		} catch (Exception e) {
 			System.out.println("[커넥션풀 생성 오류]" + e.getMessage());
-
-			throw e;
 		}
 	}
 
@@ -146,7 +143,7 @@ public class DBAccess {
 	}
 
 	/* 새로운 레코드를 PhotoSNS 테이블에 저장 */
-	public void insertToPhotoSNS(String userid, String quote, String metadata, String photoHex) throws Exception {
+	public void add_photo(String userid, String quote, String metadata, String photoHex) throws Exception {
 
 		long time = System.currentTimeMillis();
 		SimpleDateFormat takenTime = new SimpleDateFormat("yyyy년MM월dd일 HH시mm분ss초");
@@ -166,25 +163,9 @@ public class DBAccess {
 	}
 
 	public String searchByUserID(String userid) throws Exception {
-		db_connect();
 		String sql = "SELECT * FROM UserInfo WHERE ( userid = '" + userid + "','" + "');";
-		String result = "";
-		StringBuffer sb = new StringBuffer();
-		try {
-			// 질의 SQL 문장 실행
-			pstmt = c.prepareStatement(sql);
-			rs = pstmt.executeQuery();
 
-			while (rs.next()) {
-				sb.append(rs.getString(2) + "%" + rs.getString(3) + "%" + rs.getString(4) + "#");
-			}
-		} catch (Exception e) {
-			System.out.println("[반환 오류]" + e.getMessage());
-			throw e;
-		}
-
-		db_disconnect();
-		return result;
+		return getData(sql);
 	}
 
 	public String getData(String sql) throws Exception {
@@ -212,63 +193,35 @@ public class DBAccess {
 	}
 
 	public String getAll() throws Exception {
-		db_connect();
-
-		// 반환 SQL 문장 작성
 		String sql = "SELECT id, userid,quote,thumbnail,uploadDate,metadata FROM PhotoSNS ORDER BY id DESC";
+
+		String[] msg = getData(sql).split("%|\\#");
 		StringBuffer sb = new StringBuffer();
-
-		try {
-			// 질의 SQL 문장 실행
-			pstmt = c.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-
-			while (rs.next()) {
-				String thumbnailPath = rs.getString(4);
-				String Base64Thumbnail = ImageService.imageToBase64(thumbnailPath);
-				sb.append(rs.getString(1) + "%" + rs.getString(2) + "%" + rs.getString(3) + "%" + Base64Thumbnail + "%"
-						+ rs.getString(5) + "%" + rs.getString(6) + "#");
+		if (!msg[0].isEmpty()) {
+			for (int i = 0; i < msg.length; i++) {
+				if ((i + 1) % 6 == 4) {
+					String Base64Thumbnail = ImageService.imageToBase64(msg[i]);
+					msg[i] = Base64Thumbnail;
+				}
+				
+				if ((i + 1) % 6 == 0) {
+					sb.append(msg[i] + "#");
+				}else {
+					sb.append(msg[i] + "%");
+				}			
 			}
-
-		} catch (Exception e) {
-			System.out.println("[반환 오류]" + e.getMessage());
-			throw e;
 		}
-
-		db_disconnect();
-
 		// 결과 반환
 		return sb.toString();
 	}
 
 	public String getBigPhoto(String id) throws Exception {
-		db_connect();
 		String sql = "SELECT photo FROM PhotoSNS WHERE id ='" + id + "';";
-		StringBuffer sb = new StringBuffer();
-
-		try {
-			// 삽입 SQL 문장 실행
-			pstmt = c.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-			rs.next();
-			String bigPhoto = rs.getString(1);
-			String Base64BigPhoto = ImageService.imageToBase64(bigPhoto);
-			sb.append(Base64BigPhoto);
-
-		} catch (SQLException e) {
-			System.out.println("[추가 오류]" + e.getMessage());
-			throw e;
-		} catch (NullPointerException e) {
-			System.out.println("[추가 오류]" + e.getMessage());
-			throw e;
-		}
-
-		db_disconnect();
-		return sb.toString();
+		String[] msg = getData(sql).split("%|\\#");
+		return ImageService.imageToBase64(msg[0]);
 	}
 
 	public void delete(String id) {
-		// 삽입 SQL 문장 작성
 		String sql = "DELETE FROM PhotoSNS WHERE id ='" + id + "';";
 		insert(sql);
 	}

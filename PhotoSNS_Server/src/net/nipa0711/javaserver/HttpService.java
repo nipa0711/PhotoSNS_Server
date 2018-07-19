@@ -39,7 +39,7 @@ public class HttpService implements HttpHandler {
 					String metadata = androidMsg[2];
 					String photoHex = androidMsg[3];
 
-					db.insertToPhotoSNS(uploader, quote, metadata, photoHex);
+					db.add_photo(uploader, quote, metadata, photoHex);
 					System.out.println("add complete");
 				} catch (Exception e) {
 					e.printStackTrace();
