@@ -140,6 +140,7 @@ public class DBAccess {
 		String sql = "INSERT INTO UserInfo (userid, password, salt) VALUES ('" + userid + "','" + hash + "','" + salt
 				+ "');";
 		insert(sql);
+		System.out.println(userid + " is added");
 	}
 
 	/* 새로운 레코드를 PhotoSNS 테이블에 저장 */
@@ -162,8 +163,44 @@ public class DBAccess {
 		insert(sql);
 	}
 
+	public String isUserExist(String userid) {
+		String result = null;
+		try {
+			result = searchByUserID(userid);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (result.isEmpty()) {
+			return "false";
+		} else {
+			return "true";
+		}
+	}
+
+	public String login(String userid, String password) {
+		Security sec = new Security();
+		String sql = "SELECT password, salt FROM UserInfo WHERE (userid ='" + userid + "');";
+
+		try {
+			String[] result = getData(sql).split("%|\\#");
+			if (result[0].isEmpty()) {
+				return "false";
+			}
+			String savedPW = result[0];
+			String salt = result[1];
+			String hash = sec.getHash(password, salt);
+			if (savedPW.equals(hash) == true) {
+				return "true";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "false";
+	}
+
 	public String searchByUserID(String userid) throws Exception {
-		String sql = "SELECT * FROM UserInfo WHERE ( userid = '" + userid + "','" + "');";
+		String sql = "SELECT * FROM UserInfo WHERE ( userid = '" + userid + "');";
 
 		return getData(sql);
 	}
@@ -203,12 +240,12 @@ public class DBAccess {
 					String Base64Thumbnail = ImageService.imageToBase64(msg[i]);
 					msg[i] = Base64Thumbnail;
 				}
-				
+
 				if ((i + 1) % 6 == 0) {
 					sb.append(msg[i] + "#");
-				}else {
+				} else {
 					sb.append(msg[i] + "%");
-				}			
+				}
 			}
 		}
 		// 결과 반환
